@@ -1,0 +1,10 @@
+{
+  "namespace": "github.com/avalenti89",
+  "copyright": "2021, avalenti89 (https://openuserjs.org/users/avalenti89)",
+  "require": [
+    "https://unpkg.com/react@17/umd/react.development.js",
+    "https://unpkg.com/react-dom@17/umd/react-dom.development.js"
+  ],
+  "include": ["https://github.com/*"],
+  "grant": ["GM.getValue"]
+}

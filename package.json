@@ -1,0 +1,59 @@
+{
+  "name": "march-of-history",
+  "version": "1.0.0",
+  "description": "March of history game scripts",
+  "keywords": [
+    "userscript",
+    "greasemonkey",
+    "tampermonkey",
+    "rollup",
+    "typescript",
+    "react"
+  ],
+  "homepage": "https://github.com/avalenti89/march-of-history",
+  "repository": {
+    "type": "git",
+    "url": "github:avalenti89/march-of-history"
+  },
+  "bugs": {
+    "url": "https://github.com/avalenti89/march-of-history/issues",
+    "email": "valentiantonio89@gmail.com"
+  },
+  "author": "avalenti89",
+  "license": "MIT",
+  "scripts": {
+    "build": "npx rollup --config rollup.config.js",
+    "watch": "npx rollup --config rollup.config.js --watch",
+    "serve": "node -r esm server.js",
+    "start": "node -r esm server.js",
+    "build:release": "npx rollup --config rollup.config.js --sourcemap 0 --file dist/$npm_package_name-$npm_package_version.user.js",
+    "version": "npm run build:release && git add dist/$npm_package_name-$npm_package_version.user.js",
+    "prepublishOnly": "npm run build:release && git add dist/$npm_package_name-$npm_package_version.user.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.16",
+    "@babel/core": "^7.12.16",
+    "@babel/plugin-proposal-class-properties": "^7.12.13",
+    "@babel/preset-react": "^7.12.13",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-node-resolve": "^11.2.0",
+    "@rollup/plugin-replace": "^2.3.4",
+    "@rollup/plugin-typescript": "^8.2.0",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.1",
+    "colorette": "^1.2.1",
+    "esm": "^3.2.25",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "rollup": "^2.39.0",
+    "rollup-plugin-userscript-metablock": "^0.2.7",
+    "serve": "^11.3.2",
+    "tslib": "^2.1.0",
+    "typescript": "^4.1.5"
+  },
+  "config": {
+    "port": "8124"
+  },
+  "dependencies": {}
+}
