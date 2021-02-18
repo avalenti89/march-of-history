@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Sort cities select
 // @namespace    March of history
-// @version      0.1
+// @version      0.1.1
 // @description  Sort the cities list on select, based on population or priority/alphabetical
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
