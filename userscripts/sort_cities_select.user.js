@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Sort cities select
 // @namespace    March of history
-// @version      0.1.2
+// @version      0.1.3
 // @description  Sort the cities list on select, based on population or priority/alphabetical
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
@@ -38,7 +38,7 @@ const checkMutation = (target, id, callback) => {
   return observer;
 };
 
-const instance = (function () {
+const moh_sort_cities_select = (function () {
   let priority = [];
 
   let populations = [];
@@ -183,9 +183,9 @@ const instance = (function () {
   };
 })();
 
-window.sort_cities_select = instance;
+window.moh_sort_cities_select = moh_sort_cities_select;
 
 document.addEventListener("DOMContentLoaded", function (event) {
   console.log("DOM loaded");
-  instance.startScript();
+  moh_sort_cities_select.startScript();
 });
