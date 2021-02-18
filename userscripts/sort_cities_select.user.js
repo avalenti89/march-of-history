@@ -39,25 +39,12 @@ const checkMutation = (target, id, callback) => {
 };
 
 const instance = (function () {
-  let priority = [
-    "bekes",
-    "brasso",
-    "alba iulia",
-    "truda",
-    "des",
-    "zilah",
-    "kolozsvar",
-    "dlamoc",
-    "garic grad",
-    "metkovic",
-    "orahovica",
-  ];
+  let priority = [];
 
   let populations = [];
   let sortType = "populations";
 
-  const startScript = (_sortType = sortType) => {
-    sortType = _sortType;
+  const startScript = () => {
     const checkForReady = checkMutation("body", "#contenu", () => {
       checkMutation("#contenu", "#ecranCarte", () => {
         collectPopulation();
