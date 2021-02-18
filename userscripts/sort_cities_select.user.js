@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Sort cities select
 // @namespace    March of history
-// @version      0.1.3
+// @version      0.1.4
 // @description  Sort the cities list on select, based on population or priority/alphabetical
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
@@ -61,20 +61,23 @@ const moh_sort_cities_select = (function () {
     populations = [];
     console.log("collection populations");
     const list = document.querySelector(".tabsCarte #tabs-1 .accordion");
+    if (!list) return;
     const citiesElement = list.querySelectorAll("h3");
     const dataElements = list.querySelectorAll(".accordeonItem");
     citiesElement.forEach((el) => {
       const id = cleanText(el.id);
-      const cityName = cleanText(
-        el.querySelector("a.accordeonTitre").innerText
-      ).replace("seignory of ", "");
+      const _title = el.querySelector("a.accordeonTitre");
+      if (!_title) return;
+      const cityName = cleanText(_title.innerText).replace("seignory of ", "");
       const found = Array.from(dataElements).find((el) => {
         const aria = cleanText(el.getAttribute("aria-labelledby"));
         return aria === id;
       });
       if (found) {
         const wrapper = found.querySelector(".accordeonItemWrapper");
+        if (!wrapper) return;
         const action = wrapper.querySelector(".action[data-idville]");
+        if (!action) return;
         const idCity = action.getAttribute("data-idville");
         const population = Number(
           found.querySelector(".menuVillageRessourcesElement").innerText.trim()
@@ -93,6 +96,7 @@ const moh_sort_cities_select = (function () {
   const sortCities = (type) => {
     console.log("started");
     const list = document.querySelector("#villeListeVilles ul");
+    if (!list) return;
     const elements = list.querySelectorAll("li");
     console.log(`sorting by ${type}`);
     const sorted = [...elements].sort((a, b) => {
@@ -141,9 +145,11 @@ const moh_sort_cities_select = (function () {
   };
 
   const setArrows = () => {
+    if (!populations.length) return;
     const currentCityElement = document.querySelector(
       "#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > div.deroulantVilles > div > div > span.deroulantVillesNomProvince"
     );
+    if (!currentCityElement) return;
     const currentCityName = cleanText(currentCityElement.innerHTML).replace(
       "seignory of ",
       ""
@@ -163,11 +169,13 @@ const moh_sort_cities_select = (function () {
       const left = document.querySelector(
         "#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > button.btnDirectionnelLeft.action"
       );
+      if (!left) return;
       left.setAttribute("data-idville", prev_id);
       left.setAttribute("title", prev_city.cityName);
       const right = document.querySelector(
         "#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > button.btnDirectionnelRight.action"
       );
+      if (!right) return;
       right.setAttribute("data-idville", next_id);
       right.setAttribute("title", next_city.cityName);
     }
