@@ -3,9 +3,10 @@
 // @namespace    March of history
 // @version      0.1
 // @description  Sort the cities list on select, based on population or priority/alphabetical
-// @author       Gohan89
+// @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
 // @grant        none
+// @license     MIT
 // @run-at      document-start
 // ==/UserScript==
 console.log("script run");
