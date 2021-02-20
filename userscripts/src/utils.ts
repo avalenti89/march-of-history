@@ -3,7 +3,7 @@
 // @exclude *
 // ==UserLibrary==
 // @name         March of History - utilities
-// @version      0.1.1
+// @version      0.1.2
 // @description  Many usefull scripts used to run UserScripts
 // @copyright    2021, avalenti89 (https://openuserjs.org/users/avalenti89)
 // @author       avalenti89
@@ -37,6 +37,7 @@ const moh_utils = (() => {
       for (const mutation of mutationsList) {
         if (mutation.type == "childList") {
           if ((mutation.target as Element).matches(needle)) {
+            console.log("Found", needle);
             callback(mutation.target as Element);
           }
         }
@@ -52,16 +53,17 @@ const moh_utils = (() => {
 
   const checkAttributeMutation = (
     target: Element | string,
-    attributeName: string,
+    needle: string,
     callback: (attribute: any) => void
   ) => {
     const observer = new MutationObserver((mutationsList) => {
       for (const mutation of mutationsList) {
         if (
           mutation.type == "attributes" &&
-          mutation.attributeName === attributeName
+          mutation.attributeName === needle
         ) {
-          callback((mutation.target as Element).getAttribute(attributeName));
+          console.log("Found", needle);
+          callback((mutation.target as Element).getAttribute(needle));
         }
       }
     });
