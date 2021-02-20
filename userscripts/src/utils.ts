@@ -3,7 +3,7 @@
 // @exclude *
 // ==UserLibrary==
 // @name         March of History - utilities
-// @version      0.1.0
+// @version      0.1.1
 // @description  Many usefull scripts used to run UserScripts
 // @copyright    2021, avalenti89 (https://openuserjs.org/users/avalenti89)
 // @author       avalenti89
@@ -110,7 +110,7 @@ const moh_utils = (() => {
     return _cities;
   };
 
-  moh_utils.checkChildMutation("body", "#ecranCarte", () => {
+  checkChildMutation("body", "#ecranCarte", () => {
     collectCities();
   });
 
