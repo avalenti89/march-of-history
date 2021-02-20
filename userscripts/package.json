@@ -1,0 +1,26 @@
+{
+  "name": "@avalenti89/moh-userscripts",
+  "version": "0.1.0",
+  "description": "March of history userscripts",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avalenti89/march-of-history.git"
+  },
+  "keywords": [
+    "march of history",
+    "userscripts"
+  ],
+  "author": "Antonio Valenti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avalenti89/march-of-history/issues"
+  },
+  "homepage": "https://github.com/avalenti89/march-of-history#readme",
+  "devDependencies": {
+    "typescript": "^4.1.5"
+  }
+}
