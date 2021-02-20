@@ -1,5 +1,6 @@
 // ==UserScript==
 // @namespace    https://github.com/avalenti89/march-of-history/
+// @exclude *
 // ==UserLibrary==
 // @name         March of History - utilities
 // @version      0.1.0
