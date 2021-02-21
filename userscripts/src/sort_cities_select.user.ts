@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         March of History - sort cities select
 // @namespace    https://github.com/avalenti89/march-of-history/
-// @version      0.1.6
+// @version      0.1.7
 // @description  Sort the cities list on select, based on population or priority/alphabetical
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
@@ -16,25 +16,44 @@
 console.log("script run");
 
 const moh_sort_cities_select = (() => {
-  let _sortKey: keyof City = "population";
-  let _sortDesc: boolean = true;
+  let sortKey: keyof City = "population";
+  let sortDesc: boolean = true;
 
-  const sortSelect = (...[sortKey, desc]: Parameters<Cities["sortBy"]>) => {
+  let sortedCities: Array<City> = [];
+
+  const getSortedCities = () => {
     const list = document.querySelector("#villeListeVilles ul");
     const elements = list?.querySelectorAll<HTMLElement>("li");
     if (!elements?.length) return;
 
-    console.log(`sorting by ${sortKey}${desc ? "desc" : ""}`);
-    let sortList: string[] = moh_cities.cities.length
-      ? moh_cities.sortBy(sortKey, desc).map((city) => city.name)
+    console.log(`sorting by ${sortKey}${sortDesc ? "desc" : ""}`);
+    sortedCities = moh_cities.cities.length
+      ? moh_cities.sortBy(sortKey, sortDesc)
       : [...elements]
-          .map((el) =>
-            MoH_Utils.cleanText(
+          .reduce<City[]>((prev, el) => {
+            const action = el.querySelector<HTMLElement>(".action");
+            const id = action?.getAttribute("data-idville");
+            const name = MoH_Utils.cleanText(
               el.querySelector<HTMLElement>(".deroulantVillesNomProvince")
                 ?.innerText ?? ""
-            ).replace("seignory of ", "")
-          )
-          .sort();
+            ).replace("seignory of ", "");
+            if (!id || !name) return prev;
+            const city: City = {
+              id: Number(id),
+              name,
+            };
+            return [...prev, city];
+          }, [])
+          .sort((a, b) => a.name.localeCompare(b.name));
+  };
+
+  const sortSelect = () => {
+    const list = document.querySelector("#villeListeVilles ul");
+    const elements = list?.querySelectorAll<HTMLElement>("li");
+    if (!elements?.length) return;
+
+    console.log(`sorting by ${sortKey}${sortDesc ? "desc" : ""}`);
+    let sortedNames: string[] = sortedCities.map((city) => city.name);
 
     const sorted = [...elements].sort((a, b) => {
       const textA = MoH_Utils.cleanText(
@@ -46,8 +65,8 @@ const moh_sort_cities_select = (() => {
           ?.innerText ?? ""
       ).replace("seignory of ", "");
 
-      const priorA = sortList.findIndex((val) => textA.includes(val));
-      const priorB = sortList.findIndex((val) => textB.includes(val));
+      const priorA = sortedNames.findIndex((val) => textA.includes(val));
+      const priorB = sortedNames.findIndex((val) => textB.includes(val));
 
       return priorA - priorB;
     });
@@ -64,8 +83,6 @@ const moh_sort_cities_select = (() => {
   };
 
   const setArrows = () => {
-    const { cities } = moh_cities;
-    // if (!cities.length) return;
     const currentCityElement = document.querySelector(
       "#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > div.deroulantVilles > div > div > span.deroulantVillesNomProvince"
     );
@@ -73,45 +90,47 @@ const moh_sort_cities_select = (() => {
     const currentCityName = MoH_Utils.cleanText(
       currentCityElement.innerHTML
     ).replace("seignory of ", "");
-    const currentCity_index = cities.findIndex((city) => {
+    const currentCity_index = sortedCities.findIndex((city) => {
       return city.name === currentCityName;
     });
 
     const prev_city =
-      cities[currentCity_index - 1] ?? cities[cities.length - 1];
-    const prev_id = prev_city.id;
+      sortedCities[currentCity_index - 1] ??
+      sortedCities[sortedCities.length - 1];
 
-    const next_city = cities[currentCity_index + 1] ?? cities[0];
-    const next_id = next_city.id;
+    const next_city = sortedCities[currentCity_index + 1] ?? sortedCities[0];
 
-    if (next_id && prev_id) {
-      const left = document.querySelector(
+    if (next_city.id && prev_city.id) {
+      const prev_city_button = document.querySelector(
         "#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > button.btnDirectionnelLeft.action"
       );
-      if (!left) return;
-      left.setAttribute("data-idville", prev_id.toString());
-      left.setAttribute("title", prev_city.name);
-      const right = document.querySelector(
+      const next_city_button = document.querySelector(
         "#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > button.btnDirectionnelRight.action"
       );
-      if (!right) return;
-      right.setAttribute("data-idville", next_id.toString());
-      right.setAttribute("title", next_city.name);
+      if (!prev_city_button || !next_city_button) return;
+
+      prev_city_button.setAttribute("data-idville", prev_city.id.toString());
+      prev_city_button.setAttribute("title", prev_city.name);
+      next_city_button.setAttribute("data-idville", next_city.id.toString());
+      next_city_button.setAttribute("title", next_city.name);
     }
   };
 
-  const run = (...[sortKey, desc]: Parameters<Cities["sortBy"]>) => {
-    sortSelect(sortKey, desc);
+  const run = (...[_sortKey, _desc]: Parameters<Cities["sortBy"]>) => {
+    sortKey = _sortKey ?? sortKey;
+    sortDesc = _desc ?? sortDesc;
+    getSortedCities();
+    sortSelect();
     setArrows();
   };
 
   MoH_Utils.checkPageChange("#ecranVille", () => {
-    run(_sortKey, _sortDesc);
+    run();
   });
 
   return {
-    _sortKey,
-    _sortDesc,
+    sortKey,
+    sortDesc,
     run,
     sortSelect,
     setArrows,

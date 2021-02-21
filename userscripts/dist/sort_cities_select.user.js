@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         March of History - sort cities select
 // @namespace    https://github.com/avalenti89/march-of-history/
-// @version      0.1.5
+// @version      0.1.7
 // @description  Sort the cities list on select, based on population or priority/alphabetical
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
@@ -35,32 +35,45 @@ var __spread = (this && this.__spread) || function () {
 };
 console.log("script run");
 var moh_sort_cities_select = (function () {
-    var _sortKey = "population";
-    var _sortDesc = true;
-    var sortSelect = function () {
-        var _a = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            _a[_i] = arguments[_i];
-        }
-        var _b = __read(_a, 2), sortKey = _b[0], desc = _b[1];
+    var sortKey = "population";
+    var sortDesc = true;
+    var sortedCities = [];
+    var getSortedCities = function () {
         var list = document.querySelector("#villeListeVilles ul");
         var elements = list === null || list === void 0 ? void 0 : list.querySelectorAll("li");
         if (!(elements === null || elements === void 0 ? void 0 : elements.length))
             return;
-        console.log("sorting by " + sortKey + (desc ? "desc" : ""));
-        var sortList = moh_cities.cities.length
-            ? moh_cities.sortBy(sortKey, desc).map(function (city) { return city.name; })
-            : __spread(elements).map(function (el) {
+        console.log("sorting by " + sortKey + (sortDesc ? "desc" : ""));
+        sortedCities = moh_cities.cities.length
+            ? moh_cities.sortBy(sortKey, sortDesc)
+            : __spread(elements).reduce(function (prev, el) {
                 var _a, _b;
-                return MoH_Utils.cleanText((_b = (_a = el.querySelector(".deroulantVillesNomProvince")) === null || _a === void 0 ? void 0 : _a.innerText) !== null && _b !== void 0 ? _b : "").replace("seignory of ", "");
-            })
-                .sort();
+                var action = el.querySelector(".action");
+                var id = action === null || action === void 0 ? void 0 : action.getAttribute("data-idville");
+                var name = MoH_Utils.cleanText((_b = (_a = el.querySelector(".deroulantVillesNomProvince")) === null || _a === void 0 ? void 0 : _a.innerText) !== null && _b !== void 0 ? _b : "").replace("seignory of ", "");
+                if (!id || !name)
+                    return prev;
+                var city = {
+                    id: Number(id),
+                    name: name,
+                };
+                return __spread(prev, [city]);
+            }, [])
+                .sort(function (a, b) { return a.name.localeCompare(b.name); });
+    };
+    var sortSelect = function () {
+        var list = document.querySelector("#villeListeVilles ul");
+        var elements = list === null || list === void 0 ? void 0 : list.querySelectorAll("li");
+        if (!(elements === null || elements === void 0 ? void 0 : elements.length))
+            return;
+        console.log("sorting by " + sortKey + (sortDesc ? "desc" : ""));
+        var sortedNames = sortedCities.map(function (city) { return city.name; });
         var sorted = __spread(elements).sort(function (a, b) {
             var _a, _b, _c, _d;
             var textA = MoH_Utils.cleanText((_b = (_a = a.querySelector(".deroulantVillesNomProvince")) === null || _a === void 0 ? void 0 : _a.innerText) !== null && _b !== void 0 ? _b : "").replace("seignory of ", "");
             var textB = MoH_Utils.cleanText((_d = (_c = b.querySelector(".deroulantVillesNomProvince")) === null || _c === void 0 ? void 0 : _c.innerText) !== null && _d !== void 0 ? _d : "").replace("seignory of ", "");
-            var priorA = sortList.findIndex(function (val) { return textA.includes(val); });
-            var priorB = sortList.findIndex(function (val) { return textB.includes(val); });
+            var priorA = sortedNames.findIndex(function (val) { return textA.includes(val); });
+            var priorB = sortedNames.findIndex(function (val) { return textB.includes(val); });
             return priorA - priorB;
         });
         elements.forEach(function (el) { return el.remove(); });
@@ -74,30 +87,24 @@ var moh_sort_cities_select = (function () {
     };
     var setArrows = function () {
         var _a, _b;
-        var cities = moh_cities.cities;
-        // if (!cities.length) return;
         var currentCityElement = document.querySelector("#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > div.deroulantVilles > div > div > span.deroulantVillesNomProvince");
         if (!currentCityElement)
             return;
         var currentCityName = MoH_Utils.cleanText(currentCityElement.innerHTML).replace("seignory of ", "");
-        var currentCity_index = cities.findIndex(function (city) {
+        var currentCity_index = sortedCities.findIndex(function (city) {
             return city.name === currentCityName;
         });
-        var prev_city = (_a = cities[currentCity_index - 1]) !== null && _a !== void 0 ? _a : cities[cities.length - 1];
-        var prev_id = prev_city.id;
-        var next_city = (_b = cities[currentCity_index + 1]) !== null && _b !== void 0 ? _b : cities[0];
-        var next_id = next_city.id;
-        if (next_id && prev_id) {
-            var left = document.querySelector("#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > button.btnDirectionnelLeft.action");
-            if (!left)
+        var prev_city = (_a = sortedCities[currentCity_index - 1]) !== null && _a !== void 0 ? _a : sortedCities[sortedCities.length - 1];
+        var next_city = (_b = sortedCities[currentCity_index + 1]) !== null && _b !== void 0 ? _b : sortedCities[0];
+        if (next_city.id && prev_city.id) {
+            var prev_city_button = document.querySelector("#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > button.btnDirectionnelLeft.action");
+            var next_city_button = document.querySelector("#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > button.btnDirectionnelRight.action");
+            if (!prev_city_button || !next_city_button)
                 return;
-            left.setAttribute("data-idville", prev_id.toString());
-            left.setAttribute("title", prev_city.name);
-            var right = document.querySelector("#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > button.btnDirectionnelRight.action");
-            if (!right)
-                return;
-            right.setAttribute("data-idville", next_id.toString());
-            right.setAttribute("title", next_city.name);
+            prev_city_button.setAttribute("data-idville", prev_city.id.toString());
+            prev_city_button.setAttribute("title", prev_city.name);
+            next_city_button.setAttribute("data-idville", next_city.id.toString());
+            next_city_button.setAttribute("title", next_city.name);
         }
     };
     var run = function () {
@@ -105,16 +112,19 @@ var moh_sort_cities_select = (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
             _a[_i] = arguments[_i];
         }
-        var _b = __read(_a, 2), sortKey = _b[0], desc = _b[1];
-        sortSelect(sortKey, desc);
+        var _b = __read(_a, 2), _sortKey = _b[0], _desc = _b[1];
+        sortKey = _sortKey !== null && _sortKey !== void 0 ? _sortKey : sortKey;
+        sortDesc = _desc !== null && _desc !== void 0 ? _desc : sortDesc;
+        getSortedCities();
+        sortSelect();
         setArrows();
     };
     MoH_Utils.checkPageChange("#ecranVille", function () {
-        run(_sortKey, _sortDesc);
+        run();
     });
     return {
-        _sortKey: _sortKey,
-        _sortDesc: _sortDesc,
+        sortKey: sortKey,
+        sortDesc: sortDesc,
         run: run,
         sortSelect: sortSelect,
         setArrows: setArrows,

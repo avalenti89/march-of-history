@@ -3,7 +3,7 @@
 // @exclude *
 // ==UserLibrary==
 // @name         March of History - cities
-// @version      0.1.1
+// @version      0.1.2
 // @description  Cities information and utilities
 // @copyright    2021, avalenti89 (https://openuserjs.org/users/avalenti89)
 // @author       avalenti89
@@ -18,7 +18,7 @@
 interface City {
   id: number;
   name: string;
-  population: number;
+  population?: number;
   priority_order?: number;
 }
 class Cities {
