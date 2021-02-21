@@ -4,14 +4,14 @@
 // @exclude *
 // ==UserLibrary==
 // @name         March of History - cities
-// @version      0.1.0
+// @version      0.1.1
 // @description  Cities information and utilities
 // @copyright    2021, avalenti89 (https://openuserjs.org/users/avalenti89)
 // @author       avalenti89
-// @match        http://www.marchofhistory.com/EcranPrincipal.php
 // @require      https://openuserjs.org/src/libs/avalenti89/March_of_History_-_utilities.js
 // @grant        none
 // @license      MIT
+// @run-at       document-end
 // ==/UserScript==
 // ==/UserLibrary==
 /* jshint esversion: 6 */

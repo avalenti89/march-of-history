@@ -4,13 +4,13 @@
 // @exclude *
 // ==UserLibrary==
 // @name         March of History - utilities
-// @version      0.1.3
+// @version      0.1.4
 // @description  Many usefull scripts used to run UserScripts
 // @copyright    2021, avalenti89 (https://openuserjs.org/users/avalenti89)
 // @author       avalenti89
-// @match        http://www.marchofhistory.com/EcranPrincipal.php
 // @grant        none
 // @license      MIT
+// @run-at       document-start
 // ==/UserScript==
 // ==/UserLibrary==
 /* jshint esversion: 6 */
@@ -35,14 +35,17 @@ var MoH_Utils = /** @class */ (function () {
             .replace(/[\u0300-\u036f]/g, "");
     };
     MoH_Utils.checkChildMutation = function (target, needle, callback) {
+        console.log("Looking for child", needle);
         var _target = typeof target === "string"
             ? document.querySelector(target)
             : target;
         if (!_target) {
+            console.log("Not found", target);
             return void 0;
         }
         var needleEl = document.querySelector(needle);
         if (needleEl) {
+            console.log("Found child", needle);
             callback(needleEl);
         }
         var observer = new MutationObserver(function (mutationsList) {
@@ -53,7 +56,7 @@ var MoH_Utils = /** @class */ (function () {
                     var mutation = mutationsList_1_1.value;
                     if (mutation.type == "childList") {
                         if ((_c = (_b = mutation.target).matches) === null || _c === void 0 ? void 0 : _c.call(_b, needle)) {
-                            console.log("Found", needle);
+                            console.log("Found child", needle);
                             callback(mutation.target);
                         }
                     }
@@ -71,14 +74,6 @@ var MoH_Utils = /** @class */ (function () {
         return observer;
     };
     MoH_Utils.checkPageChange = function (needle, callback) {
-        var _target = document.querySelector("#contenu");
-        if (!_target) {
-            return void 0;
-        }
-        var needleEl = document.querySelector(needle);
-        if (needleEl) {
-            callback(needleEl);
-        }
         var observer = new MutationObserver(function (mutationsList) {
             var e_2, _a, e_3, _b;
             var _c, _d;
@@ -89,7 +84,7 @@ var MoH_Utils = /** @class */ (function () {
                         for (var _e = (e_3 = void 0, __values(mutation.addedNodes)), _f = _e.next(); !_f.done; _f = _e.next()) {
                             var node = _f.value;
                             if ((_d = (_c = node).matches) === null || _d === void 0 ? void 0 : _d.call(_c, needle)) {
-                                console.log("Found added", needle);
+                                console.log("Found page", needle);
                                 callback(mutation.target);
                             }
                         }
@@ -111,17 +106,32 @@ var MoH_Utils = /** @class */ (function () {
                 finally { if (e_2) throw e_2.error; }
             }
         });
-        observer.observe(_target, { childList: true });
+        var bodyObserver = MoH_Utils.checkChildMutation("body", "#contenu", function () {
+            console.log("Looking for page", needle);
+            var _target = document.querySelector("#contenu");
+            if (_target) {
+                bodyObserver === null || bodyObserver === void 0 ? void 0 : bodyObserver.disconnect();
+                var needleEl = document.querySelector(needle);
+                if (needleEl) {
+                    console.log("Found page", needle);
+                    callback(needleEl);
+                }
+                observer.observe(_target, { childList: true });
+            }
+        });
         return observer;
     };
     MoH_Utils.checkAttributeMutation = function (target, needle, callback) {
+        console.log("Looking for attribute", needle);
         var _target = typeof target === "string"
             ? document.querySelector(target)
             : target;
         if (!_target) {
+            console.log("Not Found", target);
             return void 0;
         }
         else {
+            console.log("Found attribute", needle);
             callback(_target.getAttribute(needle));
         }
         var observer = new MutationObserver(function (mutationsList) {

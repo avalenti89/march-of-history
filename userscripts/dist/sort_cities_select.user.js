@@ -8,7 +8,7 @@
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
 // @grant        none
 // @license      MIT
-// @run-at       document-start
+// @run-at       document-end
 // @require      https://openuserjs.org/src/libs/avalenti89/March_of_History_-_utilities.js
 // @require      https://openuserjs.org/src/libs/avalenti89/March_of_History_-_cities.js
 // ==/UserScript==
