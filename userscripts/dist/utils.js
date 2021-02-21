@@ -1,9 +1,10 @@
+"use strict";
 // ==UserScript==
 // @namespace    https://github.com/avalenti89/march-of-history/
 // @exclude *
 // ==UserLibrary==
 // @name         March of History - utilities
-// @version      0.1.2
+// @version      0.1.3
 // @description  Many usefull scripts used to run UserScripts
 // @copyright    2021, avalenti89 (https://openuserjs.org/users/avalenti89)
 // @author       avalenti89
@@ -24,21 +25,34 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-var moh_utils = (function () {
-    var cleanText = function (text) {
+var MoH_Utils = /** @class */ (function () {
+    function MoH_Utils() {
+    }
+    MoH_Utils.cleanText = function (text) {
         return text
             .toLowerCase()
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "");
     };
-    var checkChildMutation = function (target, needle, callback) {
+    MoH_Utils.checkChildMutation = function (target, needle, callback) {
+        var _target = typeof target === "string"
+            ? document.querySelector(target)
+            : target;
+        if (!_target) {
+            return void 0;
+        }
+        var needleEl = document.querySelector(needle);
+        if (needleEl) {
+            callback(needleEl);
+        }
         var observer = new MutationObserver(function (mutationsList) {
             var e_1, _a;
+            var _b, _c;
             try {
                 for (var mutationsList_1 = __values(mutationsList), mutationsList_1_1 = mutationsList_1.next(); !mutationsList_1_1.done; mutationsList_1_1 = mutationsList_1.next()) {
                     var mutation = mutationsList_1_1.value;
                     if (mutation.type == "childList") {
-                        if (mutation.target.matches(needle)) {
+                        if ((_c = (_b = mutation.target).matches) === null || _c === void 0 ? void 0 : _c.call(_b, needle)) {
                             console.log("Found", needle);
                             callback(mutation.target);
                         }
@@ -53,22 +67,39 @@ var moh_utils = (function () {
                 finally { if (e_1) throw e_1.error; }
             }
         });
-        if (typeof target === "string") {
-            target = document.querySelector(target);
-        }
-        observer.observe(target, { childList: true, subtree: true });
+        observer.observe(_target, { childList: true, subtree: true });
         return observer;
     };
-    var checkAttributeMutation = function (target, needle, callback) {
+    MoH_Utils.checkPageChange = function (needle, callback) {
+        var _target = document.querySelector("#contenu");
+        if (!_target) {
+            return void 0;
+        }
+        var needleEl = document.querySelector(needle);
+        if (needleEl) {
+            callback(needleEl);
+        }
         var observer = new MutationObserver(function (mutationsList) {
-            var e_2, _a;
+            var e_2, _a, e_3, _b;
+            var _c, _d;
             try {
                 for (var mutationsList_2 = __values(mutationsList), mutationsList_2_1 = mutationsList_2.next(); !mutationsList_2_1.done; mutationsList_2_1 = mutationsList_2.next()) {
                     var mutation = mutationsList_2_1.value;
-                    if (mutation.type == "attributes" &&
-                        mutation.attributeName === needle) {
-                        console.log("Found", needle);
-                        callback(mutation.target.getAttribute(needle));
+                    try {
+                        for (var _e = (e_3 = void 0, __values(mutation.addedNodes)), _f = _e.next(); !_f.done; _f = _e.next()) {
+                            var node = _f.value;
+                            if ((_d = (_c = node).matches) === null || _d === void 0 ? void 0 : _d.call(_c, needle)) {
+                                console.log("Found added", needle);
+                                callback(mutation.target);
+                            }
+                        }
+                    }
+                    catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                    finally {
+                        try {
+                            if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
+                        }
+                        finally { if (e_3) throw e_3.error; }
                     }
                 }
             }
@@ -80,58 +111,42 @@ var moh_utils = (function () {
                 finally { if (e_2) throw e_2.error; }
             }
         });
-        if (typeof target === "string") {
-            target = document.querySelector(target);
-        }
-        observer.observe(target, { attributes: true });
+        observer.observe(_target, { childList: true });
         return observer;
     };
-    var cities = [];
-    var collectCities = function () {
-        var _cities = [];
-        console.log("collecting cities");
-        var list = document.querySelector(".tabsCarte #tabs-1 .accordion");
-        if (!list)
-            return [];
-        var citiesElement = list.querySelectorAll("h3");
-        var dataElements = list.querySelectorAll(".accordeonItem");
-        citiesElement.forEach(function (el) {
-            var id = cleanText(el.id);
-            var _title = el.querySelector("a.accordeonTitre");
-            if (!_title)
-                return;
-            var cityName = cleanText(_title.innerText).replace("seignory of ", "");
-            var found = Array.from(dataElements).find(function (el) {
-                var aria = cleanText(el.getAttribute("aria-labelledby"));
-                return aria === id;
-            });
-            if (found) {
-                var wrapper = found.querySelector(".accordeonItemWrapper");
-                if (!wrapper)
-                    return;
-                var action = wrapper.querySelector(".action[data-idville]");
-                if (!action)
-                    return;
-                var idCity = Number(action.getAttribute("data-idville"));
-                var population = Number(found
-                    .querySelector(".menuVillageRessourcesElement")
-                    .innerText.trim());
-                _cities.push({ name: cityName, population: population, id: idCity });
+    MoH_Utils.checkAttributeMutation = function (target, needle, callback) {
+        var _target = typeof target === "string"
+            ? document.querySelector(target)
+            : target;
+        if (!_target) {
+            return void 0;
+        }
+        else {
+            callback(_target.getAttribute(needle));
+        }
+        var observer = new MutationObserver(function (mutationsList) {
+            var e_4, _a;
+            try {
+                for (var mutationsList_3 = __values(mutationsList), mutationsList_3_1 = mutationsList_3.next(); !mutationsList_3_1.done; mutationsList_3_1 = mutationsList_3.next()) {
+                    var mutation = mutationsList_3_1.value;
+                    if (mutation.type == "attributes" &&
+                        mutation.attributeName === needle) {
+                        console.log("Found attribute", needle);
+                        callback(mutation.target.getAttribute(needle));
+                    }
+                }
+            }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
+            finally {
+                try {
+                    if (mutationsList_3_1 && !mutationsList_3_1.done && (_a = mutationsList_3.return)) _a.call(mutationsList_3);
+                }
+                finally { if (e_4) throw e_4.error; }
             }
         });
-        console.log("collected cities");
-        cities = _cities;
-        return _cities;
+        observer.observe(_target, { attributes: true });
+        return observer;
     };
-    checkChildMutation("body", "#ecranCarte", function () {
-        collectCities();
-    });
-    return {
-        cleanText: cleanText,
-        checkChildMutation: checkChildMutation,
-        checkAttributeMutation: checkAttributeMutation,
-        collectCities: collectCities,
-        cities: cities,
-    };
-})();
-window.moh_utils = moh_utils;
+    return MoH_Utils;
+}());
+window.moh_utils = MoH_Utils;

@@ -3,7 +3,7 @@
 // @exclude *
 // ==UserLibrary==
 // @name         March of History - utilities
-// @version      0.1.2
+// @version      0.1.3
 // @description  Many usefull scripts used to run UserScripts
 // @copyright    2021, avalenti89 (https://openuserjs.org/users/avalenti89)
 // @author       avalenti89
@@ -14,118 +14,109 @@
 // ==/UserLibrary==
 /* jshint esversion: 6 */
 
-interface City {
-  id: number;
-  name: string;
-  population: number;
-}
-
-const moh_utils = (() => {
-  const cleanText = (text: string) => {
+class MoH_Utils {
+  static cleanText = (text: string) => {
     return text
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
   };
 
-  const checkChildMutation = (
-    target: Element | string,
+  static checkChildMutation = (
+    target: HTMLElement | string,
     needle: string,
-    callback: (element: Element) => void
+    callback: (element: HTMLElement) => void
   ) => {
+    let _target: HTMLElement | null =
+      typeof target === "string"
+        ? document.querySelector<HTMLElement>(target)
+        : target;
+    if (!_target) {
+      return void 0;
+    }
+
+    const needleEl = document.querySelector<HTMLElement>(needle);
+    if (needleEl) {
+      callback(needleEl);
+    }
     const observer = new MutationObserver((mutationsList) => {
       for (const mutation of mutationsList) {
         if (mutation.type == "childList") {
-          if ((mutation.target as Element).matches(needle)) {
+          if ((mutation.target as HTMLElement).matches?.(needle)) {
             console.log("Found", needle);
-            callback(mutation.target as Element);
+            callback(mutation.target as HTMLElement);
           }
         }
       }
     });
-    if (typeof target === "string") {
-      target = document.querySelector(target);
-    }
-    observer.observe(target, { childList: true, subtree: true });
+    observer.observe(_target, { childList: true, subtree: true });
 
     return observer;
   };
 
-  const checkAttributeMutation = (
-    target: Element | string,
+  static checkPageChange = (
     needle: string,
-    callback: (attribute: any) => void
+    callback: (element: HTMLElement) => void
   ) => {
+    const _target = document.querySelector("#contenu");
+    if (!_target) {
+      return void 0;
+    }
+
+    const needleEl = document.querySelector<HTMLElement>(needle);
+    if (needleEl) {
+      callback(needleEl);
+    }
+
     const observer = new MutationObserver((mutationsList) => {
       for (const mutation of mutationsList) {
+        for (const node of mutation.addedNodes) {
+          if ((node as HTMLElement).matches?.(needle)) {
+            console.log("Found added", needle);
+            callback(mutation.target as HTMLElement);
+          }
+        }
+      }
+    });
+    observer.observe(_target, { childList: true });
+
+    return observer;
+  };
+
+  static checkAttributeMutation = (
+    target: HTMLElement | string,
+    needle: string,
+    callback: (attribute: string | null) => void
+  ) => {
+    let _target: HTMLElement | null =
+      typeof target === "string"
+        ? document.querySelector<HTMLElement>(target)
+        : target;
+    if (!_target) {
+      return void 0;
+    } else {
+      callback(_target.getAttribute(needle));
+    }
+
+    const observer = new MutationObserver((mutationsList) => {
+      for (let mutation of mutationsList) {
         if (
           mutation.type == "attributes" &&
           mutation.attributeName === needle
         ) {
-          console.log("Found", needle);
-          callback((mutation.target as Element).getAttribute(needle));
+          console.log("Found attribute", needle);
+          callback((mutation.target as HTMLElement).getAttribute(needle));
         }
       }
     });
-    if (typeof target === "string") {
-      target = document.querySelector(target);
-    }
-    observer.observe(target, { attributes: true });
+
+    observer.observe(_target, { attributes: true });
     return observer;
   };
-
-  let cities: Array<City> = [];
-
-  const collectCities = () => {
-    let _cities: Array<City> = [];
-    console.log("collecting cities");
-    const list = document.querySelector(".tabsCarte #tabs-1 .accordion");
-    if (!list) return [];
-    const citiesElement = list.querySelectorAll("h3");
-    const dataElements = list.querySelectorAll(".accordeonItem");
-    citiesElement.forEach((el) => {
-      const id = cleanText(el.id);
-      const _title = el.querySelector<HTMLElement>("a.accordeonTitre");
-      if (!_title) return;
-      const cityName = cleanText(_title.innerText).replace("seignory of ", "");
-      const found = Array.from(dataElements).find((el) => {
-        const aria = cleanText(el.getAttribute("aria-labelledby"));
-        return aria === id;
-      });
-      if (found) {
-        const wrapper = found.querySelector(".accordeonItemWrapper");
-        if (!wrapper) return;
-        const action = wrapper.querySelector(".action[data-idville]");
-        if (!action) return;
-        const idCity = Number(action.getAttribute("data-idville"));
-        const population = Number(
-          found
-            .querySelector<HTMLElement>(".menuVillageRessourcesElement")
-            .innerText.trim()
-        );
-        _cities.push({ name: cityName, population, id: idCity });
-      }
-    });
-
-    console.log("collected cities");
-    cities = _cities;
-    return _cities;
-  };
-
-  checkChildMutation("body", "#ecranCarte", () => {
-    collectCities();
-  });
-
-  return {
-    cleanText,
-    checkChildMutation,
-    checkAttributeMutation,
-    collectCities,
-    cities,
-  };
-})();
+}
 
 interface Window {
-  moh_utils: typeof moh_utils;
+  moh_utils: MoH_Utils;
 }
-window.moh_utils = moh_utils;
+
+window.moh_utils = MoH_Utils;

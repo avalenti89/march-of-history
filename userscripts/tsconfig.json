@@ -9,7 +9,7 @@
     "declaration": false,
     "sourceMap": false,
     "rootDir": "./src",
-    "strict": false,
+    "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,

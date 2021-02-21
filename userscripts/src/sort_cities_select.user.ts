@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         March of History - Sort cities select
+// @name         March of History - sort cities select
 // @namespace    https://github.com/avalenti89/march-of-history/
-// @version      0.1.4
+// @version      0.1.5
 // @description  Sort the cities list on select, based on population or priority/alphabetical
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
@@ -9,88 +9,70 @@
 // @license      MIT
 // @run-at       document-start
 // @require      https://openuserjs.org/src/libs/avalenti89/March_of_History_-_utilities.js
+// @require      https://openuserjs.org/src/libs/avalenti89/March_of_History_-_cities.js
 // ==/UserScript==
 /* jshint esversion: 6 */
 
 console.log("script run");
 
 const moh_sort_cities_select = (() => {
-  const { cities, cleanText, checkChildMutation } = moh_utils;
+  let _sortKey: keyof City = "population";
+  let _sortDesc: boolean = true;
 
-  let priorityList: string[] = [];
-  let sortType = "populations";
-
-  const run = () => {
-    sortSelect(sortType);
-    setArrows();
-  };
-
-  checkChildMutation("body", "#ecranVille", () => {
-    run();
-  });
-
-  const sortSelect = (type?: string) => {
+  const sortSelect = (...[sortKey, desc]: Parameters<Cities["sortBy"]>) => {
     const list = document.querySelector("#villeListeVilles ul");
-    if (!list) return;
-    const elements = list.querySelectorAll<HTMLElement>("li");
-    console.log(`sorting by ${type}`);
-    let sortList: string[] = [];
-    switch (type) {
-      case "population":
-        sortList = [...cities]
-          .sort((a, b) => {
-            if (a.population < b.population) return 1;
-            if (a.population > b.population) return -1;
-            return 0;
-          })
-          .map((city) => city.name);
-        break;
-      case "priority":
-        sortList = priorityList;
-    }
+    const elements = list?.querySelectorAll<HTMLElement>("li");
+    if (!elements?.length) return;
+
+    console.log(`sorting by ${sortKey}${desc ? "desc" : ""}`);
+    let sortList: string[] = moh_cities.cities.length
+      ? moh_cities.sortBy(sortKey, desc).map((city) => city.name)
+      : [...elements]
+          .map((el) =>
+            MoH_Utils.cleanText(
+              el.querySelector<HTMLElement>(".deroulantVillesNomProvince")
+                ?.innerText ?? ""
+            ).replace("seignory of ", "")
+          )
+          .sort();
 
     const sorted = [...elements].sort((a, b) => {
-      const textA = cleanText(
-        a.querySelector<HTMLElement>(".deroulantVillesNomProvince").innerText
+      const textA = MoH_Utils.cleanText(
+        a.querySelector<HTMLElement>(".deroulantVillesNomProvince")
+          ?.innerText ?? ""
       ).replace("seignory of ", "");
-      const textB = cleanText(
-        b.querySelector<HTMLElement>(".deroulantVillesNomProvince").innerText
+      const textB = MoH_Utils.cleanText(
+        b.querySelector<HTMLElement>(".deroulantVillesNomProvince")
+          ?.innerText ?? ""
       ).replace("seignory of ", "");
 
-      let found = 0;
-      const priorA = priorityList.findIndex((val) => textA.includes(val));
-      const priorB = priorityList.findIndex((val) => textB.includes(val));
-      if (priorA > 0 && priorB > 0) {
-        if (priorA < priorB) return -1;
-        else if (priorA > priorB) return 1;
-        else return 0;
-      }
-      if (priorA > 0 && priorB < 0) return -1;
-      else if (priorB > 0 && priorA < 0) return 1;
-      else if (textA < textB) return -1;
-      else if (textA > textB) return 1;
-      return 0;
+      const priorA = sortList.findIndex((val) => textA.includes(val));
+      const priorB = sortList.findIndex((val) => textB.includes(val));
+
+      return priorA - priorB;
     });
+
     elements.forEach((el) => el.remove());
     sorted.forEach((el) => {
       const action = el.querySelector<HTMLElement>(".action");
-      el.title = `${moh_utils.cleanText(
+      if (!action) return;
+      el.title = `${MoH_Utils.cleanText(
         action.innerText
       )} - ${action.getAttribute("data-idville")}`;
-      list.append(el);
+      list?.append(el);
     });
   };
 
   const setArrows = () => {
-    if (!cities.length) return;
+    const { cities } = moh_cities;
+    // if (!cities.length) return;
     const currentCityElement = document.querySelector(
       "#villageWrapper > div.modaleCarte > div > div > div.menuVillageVilles > div.deroulantVilles > div > div > span.deroulantVillesNomProvince"
     );
     if (!currentCityElement) return;
-    const currentCityName = cleanText(currentCityElement.innerHTML).replace(
-      "seignory of ",
-      ""
-    );
+    const currentCityName = MoH_Utils.cleanText(
+      currentCityElement.innerHTML
+    ).replace("seignory of ", "");
     const currentCity_index = cities.findIndex((city) => {
       return city.name === currentCityName;
     });
@@ -118,9 +100,18 @@ const moh_sort_cities_select = (() => {
     }
   };
 
+  const run = (...[sortKey, desc]: Parameters<Cities["sortBy"]>) => {
+    sortSelect(sortKey, desc);
+    setArrows();
+  };
+
+  MoH_Utils.checkPageChange("#ecranVille", () => {
+    run(_sortKey, _sortDesc);
+  });
+
   return {
-    priority: priorityList,
-    sortType,
+    _sortKey,
+    _sortDesc,
     run,
     sortSelect,
     setArrows,
