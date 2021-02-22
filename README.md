@@ -6,9 +6,9 @@ These scripts are not created to hack the game, but to give a fresh life to a ga
 
 I invite you to join the game and support it with Premium Shop if you like it, even if it's an old game.
 
-Anyways, if you like my works, you can offer me a coffe (or a beer, beacause I don't like coffe, even if I am a developer)
+Anyways, if you like my works, you can offer me a beer (beacause I don't drink coffe, even if I am a developer)
 
-<a href="https://www.buymeacoffee.com/avalenti89" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffe" style="width: 120px"></a>
+<a href="https://www.buymeacoffee.com/avalenti89" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 # Overview
 
