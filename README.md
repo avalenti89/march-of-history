@@ -8,7 +8,7 @@ I invite you to join the game and support it with Premium Shop if you like it, e
 
 Anyways, if you like my works, you can offer me a beer (beacause I don't drink coffe, even if I am a developer)
 
-<a href="https://www.buymeacoffee.com/avalenti89" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+<a href="https://www.buymeacoffee.com/avalenti89"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a beer&emoji=🍺&slug=avalenti89&button_colour=5F7FFF&font_colour=ffffff&font_family=Cookie&outline_colour=000000&coffee_colour=FFDD00" style="width: 120px"></a>
 
 # Overview
 
