@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         March of History - sort cities select
 // @namespace    https://github.com/avalenti89/march-of-history/
-// @version      0.1.7
+// @version      0.1.8
 // @description  Sort the cities list on select, based on population or priority/alphabetical
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
