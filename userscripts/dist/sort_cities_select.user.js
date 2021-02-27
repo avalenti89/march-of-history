@@ -33,7 +33,7 @@ var __spread = (this && this.__spread) || function () {
     for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
     return ar;
 };
-console.log("script run");
+console.log("Sort Cities select", "script loaded");
 var moh_sort_cities_select = (function () {
     var sortKey = "population";
     var sortDesc = true;

@@ -21,6 +21,7 @@ interface City {
   population?: number;
   priority_order?: number;
 }
+
 class Cities {
   cities: Array<City> = [];
   constructor() {
