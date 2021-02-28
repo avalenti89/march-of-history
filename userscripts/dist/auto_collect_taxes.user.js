@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         March of History - auto collect taxes
 // @namespace    https://github.com/avalenti89/march-of-history/
-// @version      0.1.1
+// @version      0.1.2
 // @description  Auto collect taxes from windmill and court when enter in a signoury
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
@@ -44,18 +44,20 @@ var moh_auto_collect_taxes = (function () {
         }
     };
     var collectCourtTaxes = function () {
-        var _a = window.ville, tribunal = _a.tribunal, batiments = _a.batiments;
-        if (batiments[tribunal.ID].recoltable) {
+        var _a;
+        var _b = window.ville, tribunal = _b.tribunal, batiments = _b.batiments;
+        if ((_a = batiments[tribunal.ID]) === null || _a === void 0 ? void 0 : _a.recoltable) {
             console.log("Collecting Court");
             tribunal.recupererTaxes();
             batiments[tribunal.ID].recoltable = false;
         }
     };
     setListenerVille(function (ville) {
-        if (ville.moulin.ID) {
+        var _a, _b;
+        if ((_a = ville.moulin) === null || _a === void 0 ? void 0 : _a.ID) {
             collectWindMillTaxes();
         }
-        if (ville.tribunal.ID) {
+        if ((_b = ville.tribunal) === null || _b === void 0 ? void 0 : _b.ID) {
             collectCourtTaxes();
         }
     });
