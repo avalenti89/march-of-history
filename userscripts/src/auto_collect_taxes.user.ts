@@ -14,20 +14,6 @@
 
 console.log("Auto collect taxes", "script loaded");
 
-interface Window {
-  ville: {
-    isProxy: Symbol;
-    batiments: {
-      [key: number]: {
-        ID: number;
-        recoltable?: boolean;
-      };
-    };
-    moulin: { ID: number; recupererTaxes: () => void };
-    tribunal: { ID: number; recupererTaxes: () => void };
-  };
-}
-
 const moh_auto_collect_taxes = (() => {
   const isProxy = Symbol("isProxy");
 
