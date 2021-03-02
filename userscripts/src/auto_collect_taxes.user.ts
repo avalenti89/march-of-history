@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         March of History - auto collect taxes
 // @namespace    https://github.com/avalenti89/march-of-history/
-// @version      0.1.2
+// @version      0.1.3
 // @description  Auto collect taxes from windmill and court when enter in a signoury
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
@@ -15,28 +15,6 @@
 console.log("Auto collect taxes", "script loaded");
 
 const moh_auto_collect_taxes = (() => {
-  const isProxy = Symbol("isProxy");
-
-  const setListenerVille = (callback: (value: Window["ville"]) => void) => {
-    if (window.ville.isProxy) return;
-    else {
-      window.ville.isProxy = isProxy;
-      window.ville = new Proxy(window.ville, {
-        get(target, prop, receiver) {
-          if (prop === isProxy) {
-            return true;
-          }
-          return Reflect.get(target, prop, receiver);
-        },
-        set(target, prop, val, receiver) {
-          callback(target);
-
-          return Reflect.set(target, prop, val, receiver);
-        },
-      });
-    }
-  };
-
   const collectWindMillTaxes = () => {
     const { moulin, batiments } = window.ville;
     if (batiments?.[moulin.ID]?.recoltable) {
@@ -55,7 +33,7 @@ const moh_auto_collect_taxes = (() => {
     }
   };
 
-  setListenerVille((ville) => {
+  MoH_Utils.setListenerVille((ville) => {
     if (ville.moulin?.ID) {
       collectWindMillTaxes();
     }
