@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         March of History - auto sell wood
 // @namespace    https://github.com/avalenti89/march-of-history/
-// @version      0.1.0
+// @version      0.1.1
 // @description  Auto sell wood if the stock are full
 // @author       avalenti89
 // @match        http://www.marchofhistory.com/EcranPrincipal.php
@@ -35,7 +35,10 @@ var moh_auto_sell_woods = (function () {
         var wood = ville.infos.stocks.bois;
         var maxWood = ville.infos.stocksMax.bois;
         var woodPrice = ville.infos.cours.bois;
-        if (woodPrice > 640 && wood > maxWood - woodProd) {
+        if (woodPrice > 640 &&
+            wood > maxWood - woodProd &&
+            wood > 100 &&
+            wood > maxWood / 2) {
             console.log("Selling Wood", wood, woodPrice, woodProd);
             sellWoods();
         }
